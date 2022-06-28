@@ -1,0 +1,160 @@
+import random
+
+def printboard(b):
+  mystr = "---+---+---"
+  for i in range(3):
+    for j in range(3):
+      if j < 2:
+        print(" " + b[i][j] + " " + "|", end = "")
+      else:
+        print(" " + b[i][j] + " ")
+    if i < 2:
+      print(mystr)
+  print(" ")
+  
+#printboard(board)
+
+def win(p, b): #returns True
+
+  #horizontal
+  c = 0
+  for r in range(3):
+    if (b[r][c] == p) and (b[r][c+1] == p) and (b[r][c+2] == p):
+      return True 
+  
+  # vertical
+  r = 0
+  for c in range(3):
+    if (b[r][c] == p) and (b[r+1][c] == p) and (b[r+2][c] == p):
+      return True
+      
+  #diagonal wins - only 2
+  if (b[0][0] == p) and (b[1][1] == p) and (b[2][2] == p):
+      return True 
+  if (b[0][2] == p) and (b[1][1] == p) and (b[2][0] == p):
+      return True 
+  return False
+  
+#print(win("x", board))
+
+def AImakemove(b):
+  copy = []
+  for i in range(3):
+    row = []
+    for j in range(3):
+      row.append(b[i][j])
+    copy.append(row)
+  
+  #winning move for computer
+  for r in range(3):
+    for c in range(3):
+      if copy[r][c] == " ":
+        copy[r][c] = "o"
+        if win("o", copy):
+          return r,c
+        else:
+          copy[r][c] = " "
+  
+  #block x
+  for r in range(3):
+    for c in range(3):
+      if copy[r][c] == " ":
+        copy[r][c] = "x"
+        if win("x", copy):
+          return r,c
+        else:
+          copy[r][c] = " "
+          
+  #center, corner or sides
+  
+  if b[1][1] == " ":
+    return 1, 1
+    
+  cornerslist =  [[0, 0], [0, 2],[2,0] ,[2, 2]]
+  for i in range(len(cornerslist)):
+    if b[cornerslist[i][0]][cornerslist[i][1]] == " ":
+      return cornerslist[i][0], cornerslist[i][1]
+  
+  not_found = True
+  while not_found:
+    r = random.randint(0,2)
+    c = random.randint(0,2)
+    if b[r][c] == " ":
+      return r,c     
+
+  
+  
+def random_makemove(b):
+  not_found = True
+  while not_found:
+    r = random.randint(0,2)
+    c = random.randint(0,2)
+    if b[r][c] == " ":
+      return r,c
+       
+#print(makemove(board))
+
+def tie_game(b):
+  for r in range(3):
+    for c in range(3):
+      if b[r][c] == " ":
+        return False
+  return True
+      
+ 
+ties = 0
+randoms = 0
+computers = 0
+
+for i in range(1000):
+  board = []
+  for i in range(3):
+    row = []
+    for j in range(3):
+      row.append(" ")
+    board.append(row)
+    
+  tie = False
+  who = random.randint(1,2)
+  if who == 1:
+    p = "x"
+  else:
+    p = "o"
+
+  
+
+  while True:
+    if p == "x":
+      r, c = random_makemove(board)
+      board[r][c] = "x"
+      
+    elif p == "o":
+      row,col = AImakemove(board)
+      board[row][col] = "o"
+    
+    if win(p, board):
+      break
+      
+    if tie_game(board):
+      tie = True
+      break
+    
+    if p =="x":
+      p = "o"
+    else:
+      p = "x"
+      
+  if tie:
+    ties+= 1
+    
+  else:
+    if p == "x":
+      randoms +=1
+    else:
+      computers += 1
+
+      
+print("TIES: "+ str(ties))
+print("RANDOM WINS: "+ str(randoms))
+print("COMPUTER WINS: " + str(computers))
+        
