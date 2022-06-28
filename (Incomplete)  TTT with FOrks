@@ -1,0 +1,191 @@
+import random
+
+board = []
+for i in range(3):
+  row = []
+  for j in range(3):
+    row.append(" ")
+  board.append(row)
+
+
+def printboard(b):
+  mystr = "---+---+---"
+  for i in range(3):
+    for j in range(3):
+      if j < 2:
+        print(" " + b[i][j] + " " + "|", end = "")
+      else:
+        print(" " + b[i][j] + " ")
+    if i < 2:
+      print(mystr)
+  print(" ")
+  
+#printboard(board)
+
+def win(p, b): #returns True
+
+  #horizontal
+  c = 0
+  for r in range(3):
+    if (b[r][c] == p) and (b[r][c+1] == p) and (b[r][c+2] == p):
+      return True 
+  
+  # vertical
+  r = 0
+  for c in range(3):
+    if (b[r][c] == p) and (b[r+1][c] == p) and (b[r+2][c] == p):
+      return True
+      
+  #diagonal wins - only 2
+  if (b[0][0] == p) and (b[1][1] == p) and (b[2][2] == p):
+      return True 
+  if (b[0][2] == p) and (b[1][1] == p) and (b[2][0] == p):
+      return True 
+  return False
+  
+#print(win("x", board))
+
+  
+def makemove(b):
+  copy = []
+  for i in range(3):
+    row = []
+    for j in range(3):
+      row.append(b[i][j])
+    copy.append(row)
+  
+  print("play winning move")
+  #winning move for computer
+  for r in range(3):
+    for c in range(3):
+      if copy[r][c] == " ":
+        copy[r][c] = "o"
+        if win("o", copy):
+          return r,c
+        else:
+          copy[r][c] = " "
+  print("block winning move")
+  #block x
+  for r in range(3):
+    for c in range(3):
+      if copy[r][c] == " ":
+        copy[r][c] = "x"
+        if win("x", copy):
+          return r,c
+        else:
+          copy[r][c] = " "
+          
+  #forks
+  
+  #own fork
+  print("playing a fork")
+  for i in range(3):
+    for j in range(3):
+      if fork(b, i, j, "o"):
+        return i, j
+  
+  print("blocking a fork")
+  #take x's fork
+  for i in range(3):
+    for j in range(3):
+      if fork(b, i, j, "x"):
+        return i, j
+    
+  
+  #center, corner or sides
+  
+  if b[1][1] == " ":
+    return 1, 1
+    
+  cornerslist =  [[0, 0], [0, 2],[2,0] ,[2, 2]]
+  for i in range(len(cornerslist)):
+    if b[cornerslist[i][0]][cornerslist[i][1]] == " ":
+      return cornerslist[i][0], cornerslist[i][1]
+  
+  not_found = True
+  while not_found:
+    r = random.randint(0,2)
+    c = random.randint(0,2)
+    if b[r][c] == " ":
+      return r,c  
+      
+def fork(b, i ,j, p):
+  copy = []
+  for i in range(3):
+    row = []
+    for j in range(3):
+      row.append(b[i][j])
+    copy.append(row)
+
+  if copy[i][j] != " ":
+    return False
+    
+  copy[i][j] = p
+  
+  wins = 0
+    
+  for r in range(3):
+    for c in range(3):
+      if copy[r][c] == " ":
+        copy[r][c] = p
+        if win(p, copy):
+          wins +=1
+        copy[r][c] = " "
+
+  if wins == 2:
+    return True
+  return False
+
+
+def tie(b):
+  for r in range(3):
+    for c in range(3):
+      if b[r][c] == " ":
+        return False
+  return True
+      
+ 
+who = random.randint(0,1)
+if who == 0:
+  print("The coin flip shows that the computer (o) will go first")
+  p = "o"
+if who == 1:
+  print("the coin flip shows that you (x) will go first" )
+  p = "x"
+  
+input("Press Enter to begin")
+
+      
+game = True      
+while game:
+  
+  printboard(board)
+  
+  if p == "x":
+    row = int(input("please pick a row to play: "))
+    col = int(input("please pick a col to play: "))
+    board[row][col] = "x"
+    
+  if p == "o":
+    row,col = makemove(board)
+    board[row][col] = "o"
+    
+  if win(p, board):
+    if p == "x":
+      printbord(board)
+      print("Good job, you won!")
+      game = False
+    else:
+      printboard(board)
+      print("The computer won")
+      game = False
+      
+  if tie(board):
+    printboard(board)
+    print("It was a tie")
+    game = False
+    
+  if p =="x":
+    p = "o"
+  else:
+    p = "x"
